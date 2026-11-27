@@ -1,0 +1,67 @@
+name: workpilot-demo
+
+x-app: &app
+  image: workpilot-accounting:m0-demo
+  environment: &database-env
+    DATABASE_URL: postgresql://workpilot_demo:workpilot_demo@db:5432/workpilot_demo
+
+services:
+  db:
+    image: postgres:17.12-bookworm
+    environment:
+      POSTGRES_DB: workpilot_demo
+      POSTGRES_USER: workpilot_demo
+      POSTGRES_PASSWORD: workpilot_demo
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - demo-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "workpilot_demo", "-d", "workpilot_demo"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    <<: *app
+    build: .
+    command: ["pnpm", "db:deploy"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    pull_policy: never
+    command: ["pnpm", "--filter", "@workpilot/api", "start"]
+    environment:
+      <<: *database-env
+      API_HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/api/v1/health/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  web:
+    image: workpilot-accounting:m0-demo
+    pull_policy: never
+    command: ["pnpm", "--filter", "@workpilot/web", "exec", "next", "start", "--hostname", "0.0.0.0"]
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  demo-data:

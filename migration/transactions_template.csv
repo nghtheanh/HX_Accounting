@@ -1,0 +1,2 @@
+source_id,business_date,document_type,document_number,party_code,item_sku,lot_code,quantity,amount,currency,evidence_status
+DEMO-001,2026-01-02,purchase,DEMO-P001,DEMO-SUP,DEMO-FAB,DEMO-LOT,100,11000000,VND,verified

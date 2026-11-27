@@ -1,0 +1,27 @@
+{
+  "name": "workpilot-accounting",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": "24.22.3"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @workpilot/web --filter @workpilot/api dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . --max-warnings=0",
+    "test": "pnpm test:golden && pnpm --filter @workpilot/api test",
+    "test:golden": "python tests/verify_golden.py",
+    "test:db": "pnpm --filter @workpilot/api test:db",
+    "test:smoke": "node tests/smoke.mjs",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status"
+  },
+  "devDependencies": {
+    "eslint": "10.15.0",
+    "@next/eslint-plugin-next": "16.4.6",
+    "prisma": "7.10.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.74.0"
+  }
+}

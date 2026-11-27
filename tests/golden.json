@@ -1,0 +1,72 @@
+{
+  "notice": "DEMO; no VAT; VND; approved sandbox policy only",
+  "inventory": {
+    "opening_qty": "200",
+    "opening_price": "95000",
+    "receipt_qty": "100",
+    "receipt_price": "110000",
+    "issue_qty": "150",
+    "expected_average": "100000",
+    "expected_issue": "15000000",
+    "expected_remaining": "15000000"
+  },
+  "allocation": {
+    "debts": [
+      "20000000",
+      "25000000",
+      "15000000"
+    ],
+    "payment": "50000000",
+    "allocated": [
+      "20000000",
+      "25000000",
+      "5000000"
+    ],
+    "expected_remaining": "10000000"
+  },
+  "costing": {
+    "wip_open": "0",
+    "costs": [
+      "28000000",
+      "15000000",
+      "8000000",
+      "9000000"
+    ],
+    "wip_close": "0",
+    "quantity": "1000",
+    "revenue": "80000000",
+    "expected_cogs": "60000000",
+    "expected_unit": "60000",
+    "expected_gross": "20000000"
+  },
+  "payroll": {
+    "base": "5000000",
+    "piece_qty": "200",
+    "piece_rate": "5000",
+    "allowance": "500000",
+    "advance": "1000000",
+    "deduction": "0",
+    "expected_gross": "6500000",
+    "expected_payable": "5500000"
+  },
+  "journal": {
+    "lines": [
+      {
+        "account": "112",
+        "debit": "20000000",
+        "credit": "0"
+      },
+      {
+        "account": "131",
+        "debit": "0",
+        "credit": "20000000"
+      }
+    ]
+  },
+  "mts": {
+    "blank_qty": "500",
+    "blank_unit": "40000",
+    "finishing": "5000000",
+    "expected_total": "25000000"
+  }
+}

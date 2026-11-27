@@ -1,0 +1,10 @@
+# Kiến trúc kỹ thuật
+Monorepo pnpm: apps/web (Next.js), apps/api (NestJS), packages/domain, ui, contracts, tests. PostgreSQL là nguồn dữ liệu chính. Prisma migration, SQL constraints bổ sung. Redis/BullMQ chỉ khi có job nặng; S3-compatible lưu file private. REST /api/v1 + OpenAPI. Docker Compose VPS, reverse proxy TLS; không mở cổng DB công khai.
+## Ranh giới
+Accounting sở hữu journal/period; Inventory sở hữu stock movement/pool; Sales/Purchase sở hữu orders/receipts; Payments sở hữu open items/allocation; Manufacturing sở hữu BOM/production; Costing sở hữu cost entries/runs; Payroll sở hữu attendance/payroll; Approval sở hữu rule/decision; Reports chỉ đọc projection; IAM sở hữu roles. Module không ghi trực tiếp bảng của module khác; dùng service/domain command trong cùng transaction.
+## Ghi sổ nguyên tử
+Authorize -> validate input/policy/version -> lock period, document, stock/open items theo thứ tự -> validate approval -> tạo journal, subledger, outbox, audit -> commit. Idempotency key scoped theo company/action, hash payload; replay cùng payload trả kết quả cũ, khác payload 409. Retry serialization/deadlock có giới hạn. Outbox consumer at-least-once với dedupe event ID; không dùng event async làm nguồn duy nhất cho số dư tài chính.
+## ERP
+ID UUID ổn định; company_id trên domain, scope bắt buộc. API read-only service account cho AI sau này; không cấp quyền ghi sổ/chuyển tiền. Event version, correlation ID, schema version, không chứa dữ liệu nhạy cảm không cần thiết. Bank adapter read-only: listTransactions(cursor), normalize, health; token mã hóa, consent và revoke. Máy chấm công adapter import CSV/XLSX trước, SDK sau khi biết model.
+## ERD logic
+Company 1-N Document; Document 1-N JournalEntry 1-N JournalLine; Account 1-N JournalLine; Warehouse/SKU 1-N StockMovement; Lot 1-N StockMovement; Payment N-M OpenItem qua Allocation; ProductVariant 1-N BOMVersion 1-N BOMLine; ProductionOrder N-1 BOMVersion, 1-N CostEntry; PayrollRun 1-N PayrollLine; Document 1-N Approval/Audit. Schema SQL là lõi tham chiếu, các bảng mở rộng cần migration theo milestone.
